@@ -2,12 +2,20 @@
   <div class="users">
     <div class="container">
       <section>
+        <h5 class="title">Novo usuário</h5>
+        <form @submit.prevent="submitNewUser">
+          <input v-model="form.name" type="text" placeholder="Nome">
+          <input v-model="form.email" type="text" placeholder="E-mail">
+          <button type="submit">Adicionar</button>
+        </form>
+      </section>
+      <section>
         <h5 class="title">Lista de usuários</h5>
         <ul>
           <li v-for="(user, i) in users" :key="i">
             <p>{{ user.name }}</p>
             <small>{{ user.email }}</small>
-            <a href="" class="destroy"></a>
+            <a class="destroy"></a>
           </li>
         </ul>
       </section>
@@ -17,7 +25,7 @@
 
 <script setup lang="ts">
 import axios from './utils/axios'
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, reactive } from 'vue';
 
 interface User {
   id: string,
@@ -29,6 +37,11 @@ onMounted(() => {
   fetchUsers()
 })
 
+const form = reactive({
+  name: '',
+  email: ''
+})
+
 const users = ref<User[]>([])
 
 async function fetchUsers() {
@@ -36,9 +49,26 @@ async function fetchUsers() {
     const { data } = await axios.get('/users')
     users.value = data
   } catch (error) {
-    console.log(error)
+    console.warn(error)
   }
 }
+
+async function createUser() {
+  try {
+    await axios.post('/users', form)
+    form.name = ''
+    form.email = ''
+  } catch (error) {
+    console.warn(error)
+  } 
+}
+
+async function submitNewUser() {
+  await createUser()
+  await fetchUsers()
+}
+
+
 
 </script>
 
@@ -89,7 +119,7 @@ button {
   box-shadow: 0 0 5px 3px rgba(45, 108, 234, 0.3);
 }
 
-button:hover{
+button:hover {
   background-color: #1b5cdc;
 }
 
@@ -122,7 +152,7 @@ li {
   cursor: pointer;
   transition: all 0.2s linear;
   position: absolute;
-  top: 50%;
+  top: 35%;
   transform: translate(-50%);
   right: 1.3rem;
 }
