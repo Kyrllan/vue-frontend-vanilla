@@ -68,8 +68,6 @@ async function submitNewUser() {
   await fetchUsers()
 }
 
-
-
 </script>
 
 <style scoped>
