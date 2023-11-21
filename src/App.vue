@@ -6,7 +6,9 @@
         <form @submit.prevent="submitNewUser">
           <input v-model="form.name" type="text" placeholder="Nome">
           <input v-model="form.email" type="text" placeholder="E-mail">
-          <button type="submit">Adicionar</button>
+          <button  type="submit">
+            <div v-if="loading" class="loading-circle"></div>
+            Adicionar</button>
         </form>
       </section>
       <section>
@@ -43,6 +45,7 @@ const form = reactive({
 })
 
 const users = ref<User[]>([])
+const loading = ref(false)
 
 async function fetchUsers() {
   try {
@@ -55,12 +58,15 @@ async function fetchUsers() {
 
 async function createUser() {
   try {
+    loading.value = true
     await axios.post('/users', form)
     form.name = ''
     form.email = ''
   } catch (error) {
     console.warn(error)
-  } 
+  } finally {
+    loading.value = false
+  }
 }
 
 async function submitNewUser() {
@@ -105,6 +111,7 @@ input::placeholder {
 }
 
 button {
+  display: flex;
   background-color: #2d6cea;
   color: #e1e8ef;
   border: none;
@@ -119,6 +126,25 @@ button {
 
 button:hover {
   background-color: #1b5cdc;
+}
+
+.loading-circle {
+  width: 10px;
+  height: 10px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #3498db;
+  animation: spin 1s linear infinite;
+  margin: 0 4px;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 p {
