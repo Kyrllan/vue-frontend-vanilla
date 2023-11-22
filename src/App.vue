@@ -6,9 +6,10 @@
         <form @submit.prevent="submitNewUser">
           <input v-model="form.name" type="text" placeholder="Nome">
           <input v-model="form.email" type="text" placeholder="E-mail">
-          <button  type="submit">
+          <button type="submit">
             <div v-if="loading" class="loading-circle"></div>
-            Adicionar</button>
+            Adicionar
+          </button>
         </form>
       </section>
       <section>
@@ -17,7 +18,7 @@
           <li v-for="(user, i) in users" :key="i">
             <p>{{ user.name }}</p>
             <small>{{ user.email }}</small>
-            <a class="destroy"></a>
+            <a class="destroy" @click="requestDeleteUser(user.id)"></a>
           </li>
         </ul>
       </section>
@@ -69,8 +70,21 @@ async function createUser() {
   }
 }
 
+async function deleteUser(id: User['id']) {
+  try {
+    await axios.delete(`/users/${id}`)
+  } catch (error) {
+    console.warn(error)
+  }
+}
+
 async function submitNewUser() {
   await createUser()
+  await fetchUsers()
+}
+
+async function requestDeleteUser(id: User['id']) {
+  await deleteUser(id)
   await fetchUsers()
 }
 
@@ -142,6 +156,7 @@ button:hover {
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
